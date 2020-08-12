@@ -316,7 +316,7 @@ export default {
       this.selectedDay = null
     },
 
-    save () {
+    async save () {
       this.loading = true
 
       const date = new Date(this.date)
@@ -329,7 +329,36 @@ export default {
         timestamp: dateTimestamp
       }
 
-      this.$firebase.firestore().collection('timesheets').add(entry)
+      await this.$firebase.firestore().collection('timesheets')
+        .where('timestamp', '==', dateTimestamp)
+        .where('firstName', '==', this.user.firstName)
+        .where('lastName', '==', this.user.lastName)
+        .get()
+        .then((result) => {
+          result.forEach((doc) => {
+            // Already exists for chosen date
+            // Delete
+            this.$firebase.firestore().collection('timesheets').doc(doc.id).delete()
+              .catch((err) => {
+                this.setAlert({
+                  msg: err.message,
+                  type: 'error'
+                })
+
+                return
+              })
+          })
+        })
+        .catch((err) => {
+          this.setAlert({
+            msg: err.message,
+            type: 'error'
+          })
+
+          return
+        })
+
+      await this.$firebase.firestore().collection('timesheets').add(entry)
         .then(() => {
           this.setAlert({
             msg: 'Timesheet saved successfully.',
