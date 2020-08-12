@@ -54,43 +54,36 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-
-      <v-alert
-        v-if="response"
-        class="mt-2"
-        :type="response.type"
-      >
-        {{ response.msg }}
-      </v-alert>
     </v-col>
   </v-row>
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
+
 export default {
   name: 'Login',
 
   data () {
     return {
       email: '',
-      password: '',
-      response: null
+      password: ''
     }
   },
 
   methods: {
-    login () {
-      this.response = null
+    ...mapMutations([
+      'setAlert'
+    ]),
 
+    login () {
       this.$firebase.auth().signInWithEmailAndPassword(this.email, this.password)
         .then(() => this.$router.push('/'))
         .catch((err) => {
-          const errorMessage = err.message
-
-          this.response = {
-            msg: errorMessage,
+          this.setAlert({
+            msg: err.message,
             type: 'error'
-          }
+          })
         })
     },
 

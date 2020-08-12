@@ -86,19 +86,13 @@
           </ul>
         </v-card-text>
       </v-card>
-
-      <v-alert
-        v-if="response"
-        class="mt-2"
-        :type="response.type"
-      >
-        {{ response.msg }}
-      </v-alert>
     </v-col>
   </v-row>
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
+
 export default {
   name: 'Login',
 
@@ -110,8 +104,7 @@ export default {
         firstName: '',
         lastName: '',
         password: ''
-      },
-      response: null
+      }
     }
   },
 
@@ -126,9 +119,11 @@ export default {
   },
 
   methods: {
-    submit () {
-      this.response = null
+    ...mapMutations([
+      'setAlert'
+    ]),
 
+    submit () {
       this.$firebase.auth().createUserWithEmailAndPassword(this.form.email, this.form.password)
         .then((result) => {
           const uuid = result.user.uid
@@ -139,21 +134,17 @@ export default {
 
           this.$firebase.firestore().collection('users').doc(uuid).set(userInfo)
             .catch((err) => {
-              const errorMessage = err.message
-
-              this.response = {
-                msg: errorMessage,
+              this.setAlert({
+                msg: err.message,
                 type: 'error'
-              }
+              })
             })
         })
         .catch((err) => {
-          const errorMessage = err.message
-
-          this.response = {
-            msg: errorMessage,
+          this.setAlert({
+            msg: err.message,
             type: 'error'
-          }
+          })
         })
     },
 

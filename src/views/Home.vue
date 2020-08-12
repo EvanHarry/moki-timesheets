@@ -1,6 +1,6 @@
 <template>
   <v-row justify="center">
-    <v-col v-if="!loading && !response">
+    <v-col v-if="!loading">
       <v-card outlined>
         <v-card-title>Home</v-card-title>
 
@@ -161,7 +161,7 @@
       </v-card>
     </v-col>
 
-    <v-col v-else-if="loading && !response">
+    <v-col v-else>
       <v-card outlined>
         <v-card-title>Saving...</v-card-title>
 
@@ -175,15 +175,11 @@
         </v-card-text>
       </v-card>
     </v-col>
-
-    <v-col v-else-if="!loading && response">
-      <v-alert :type="response.type">{{ response.msg }}</v-alert>
-    </v-col>
   </v-row>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapMutations, mapState } from 'vuex'
 
 const minsToString = (total, prefix) => {
   if (total < 0) return `${prefix}: 0 Hrs`
@@ -214,8 +210,7 @@ export default {
       selectedDay: null,
       startTime: null,
       endTime: null,
-      breakTime: null,
-      response: null
+      breakTime: null
     }
   },
 
@@ -289,6 +284,10 @@ export default {
   },
 
   methods: {
+    ...mapMutations([
+      'setAlert'
+    ]),
+
     allowedDates (val) {
       const date = new Date(val)
 
@@ -332,18 +331,16 @@ export default {
 
       this.$firebase.firestore().collection('timesheets').add(entry)
         .then(() => {
-          this.response = {
+          this.setAlert({
             msg: 'Timesheet saved successfully.',
             type: 'success'
-          }
+          })
         })
         .catch((err) => {
-          const errorMessage = err.message
-
-          this.response = {
-            msg: errorMessage,
+          this.setAlert({
+            msg: err.message,
             type: 'error'
-          }
+          })
         })
         .finally(() => this.loading = false)
     },

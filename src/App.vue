@@ -94,6 +94,27 @@
         {{ new Date().getFullYear() }} - <strong>Evan Harry</strong>
       </v-col>
     </v-footer>
+
+    <v-snackbar
+      v-if="alert"
+      v-model="alert"
+      bottom
+      :color="alert.type"
+      :timeout="5000"
+    >
+      {{ alert.msg }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          @click="setAlert(null)"
+          dark
+          icon
+          v-bind="attrs"
+        >
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-app>
 </template>
 
@@ -112,11 +133,22 @@ export default {
   computed: {
     ...mapState([
       'user'
-    ])
+    ]),
+
+    alert: {
+      get () {
+        return this.$store.state.alert
+      },
+
+      set () {
+        this.setAlert(null)
+      }
+    }
   },
 
   methods: {
     ...mapMutations([
+      'setAlert',
       'setUser'
     ]),
 
