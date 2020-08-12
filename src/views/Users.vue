@@ -2,7 +2,7 @@
   <v-row justify="center">
     <v-col>
       <v-card outlined>
-        <v-card-title>Home</v-card-title>
+        <v-card-title>Users</v-card-title>
       </v-card>
     </v-col>
   </v-row>
@@ -10,6 +10,6 @@
 
 <script>
 export default {
-  name: 'Home'
+  name: 'Users'
 }
 </script>

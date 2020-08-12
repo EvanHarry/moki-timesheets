@@ -1,4 +1,8 @@
-# moki-timesheets
+# MOKI-Timesheets
+
+## Firebase setup
+* Install Firebase CLI https://firebase.google.com/docs/cli
+* Create `src/plugins/config.js` and insert your Firebase configuration.
 
 ## Project setup
 ```
@@ -15,10 +19,7 @@ npm run serve
 npm run build
 ```
 
-### Lints and fixes files
+### Deploy to Firebase
 ```
-npm run lint
+firebase deploy
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
