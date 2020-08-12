@@ -1,21 +1,11 @@
 import Vue from 'vue'
-import vuex from 'vuex'
+import Vuex from 'vuex'
 
-Vue.use(vuex)
+Vue.use(Vuex)
 
-export default new vuex.Store({
+export default new Vuex.Store({
   state: {
     user: null
-  },
-
-getters: {
-    isAdmin (state) {
-      return !!state.user && state.user.admin
-    },
-
-    loggedIn (state) {
-      return !!state.user
-    }
   },
 
   mutations: {

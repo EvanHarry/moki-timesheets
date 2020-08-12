@@ -9,7 +9,7 @@
       flat
     >
       <v-app-bar-nav-icon
-        v-if="loggedIn && $vuetify.breakpoint.mdAndDown"
+        v-if="user && $vuetify.breakpoint.mdAndDown"
         @click="drawer = !drawer"
       />
 
@@ -18,7 +18,7 @@
       <v-spacer />
 
       <v-btn
-        v-if="loggedIn"
+        v-if="user"
         @click="logout"
         text
       >
@@ -27,7 +27,7 @@
     </v-app-bar>
 
     <v-navigation-drawer
-      v-if="loggedIn"
+      v-if="user"
       v-model="drawer"
       app
       clipped
@@ -62,29 +62,13 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item
-          :disabled="!isAdmin"
-          to="/timesheets"
-        >
+        <v-list-item to="/timesheets">
           <v-list-item-icon>
             <v-icon>mdi-calendar</v-icon>
           </v-list-item-icon>
 
           <v-list-item-content>
             <v-list-item-title>Timesheets</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-
-        <v-list-item
-          :disabled="!isAdmin"
-          to="/users"
-        >
-          <v-list-item-icon>
-            <v-icon>mdi-account-multiple</v-icon>
-          </v-list-item-icon>
-
-          <v-list-item-content>
-            <v-list-item-title>Users</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -114,24 +98,18 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapState } from 'vuex'
+import { mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'App',
 
   data () {
     return {
-      authWatcher: null,
       drawer: null
     }
   },
 
   computed: {
-    ...mapGetters([
-      'isAdmin',
-      'loggedIn'
-    ]),
-
     ...mapState([
       'user'
     ])
@@ -144,30 +122,30 @@ export default {
 
     logout () {
       this.$firebase.auth().signOut()
+        .then(() => this.$router.push('/login'))
     }
   },
 
   created () {
-    this.authWatcher = this.$firebase.auth().onAuthStateChanged((user) => {
+    this.$firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         const uuid = user.uid
 
         this.$firebase.firestore().collection('users').doc(uuid).get()
           .then((doc) => {
             if (doc.exists) {
-              const userInfo = doc.data()
+              const _user = {
+                ...doc.data(),
+                email: user.email
+              }
 
-              this.setUser(userInfo)
-
-              this.$router.push('/')
+              this.setUser(_user)
             } else {
               console.log('Error retrieving user info.')
             }
           })
       } else {
         this.setUser(null)
-
-        this.$router.push('/login')
       }
     })
   }

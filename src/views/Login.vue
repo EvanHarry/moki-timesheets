@@ -5,7 +5,7 @@
       md="6"
     >
       <v-card outlined>
-        <v-card-title>Login</v-card-title>
+        <v-card-title>Please Login</v-card-title>
 
         <v-divider />
 
@@ -36,8 +36,17 @@
 
         <v-card-actions>
           <v-btn
+            @click="register"
+            color="success"
+            text
+          >
+            Register
+          </v-btn>
+
+          <v-spacer />
+
+          <v-btn
             @click="login"
-            block
             color="primary"
             text
           >
@@ -74,26 +83,7 @@ export default {
       this.response = null
 
       this.$firebase.auth().signInWithEmailAndPassword(this.email, this.password)
-        .then(() => {
-          // this.$router.push('/')
-
-          // this.$firebase.firestore().collection('users').doc(uuid).get()
-          //   .then((doc) => {
-          //     if (doc.exists) {
-          //       const user = doc.data()
-
-          //       this.response = {
-          //         msg: `Welcome, ${user.firstName} ${user.lastName}!`,
-          //         type: 'success'
-          //       }
-          //     } else {
-          //       this.response = {
-          //         msg: 'Error retrieving user details.',
-          //         type: 'error'
-          //       }
-          //     }
-          //   })
-        })
+        .then(() => this.$router.push('/'))
         .catch((err) => {
           const errorMessage = err.message
 
@@ -102,6 +92,10 @@ export default {
             type: 'error'
           }
         })
+    },
+
+    register () {
+      this.$router.push('/register')
     }
   }
 }
