@@ -5,10 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    alert: {
-      msg: 'Test',
-      type: 'success'
-    },
+    alert: null,
 
     user: null
   },
