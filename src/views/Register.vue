@@ -146,6 +146,7 @@ export default {
             type: 'error'
           })
         })
+        .finally(() => this.$router.push('/'))
     },
 
     validate () {
