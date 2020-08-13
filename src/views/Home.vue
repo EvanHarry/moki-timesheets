@@ -236,7 +236,12 @@ export default {
 
   watch: {
     date (val) {
+      // Always reset data to cause other watchers to trigger
+      this.times = []
+      this.selectedDay = null
+
       if (val) {
+        // Set default times
         this.times = [
           { day: 'Wednesday', start: 540, end: 1020, break: 20 },
           { day: 'Thursday', start: 540, end: 1020, break: 20 },
@@ -247,7 +252,24 @@ export default {
           { day: 'Tuesday', start: 540, end: 1020, break: 20 }
         ]
 
-        this.selectedDay = this.days[0]
+        // Check if entry already in database
+        const date = new Date(val)
+        const dateTimestamp = date.getTime()
+
+        this.$firebase.firestore().collection('timesheets')
+          .where('timestamp', '==', dateTimestamp)
+          .where('firstName', '==', this.user.firstName)
+          .where('lastName', '==', this.user.lastName)
+          .get()
+          .then((result) => {
+            result.forEach((doc) => {
+              // Already exists for chosen date
+              const data = doc.data()
+
+              this.times = data.times
+            })
+          })
+          .finally(() => this.selectedDay = this.days[0])
       }
     },
 
