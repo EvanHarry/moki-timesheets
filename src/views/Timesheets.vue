@@ -120,6 +120,14 @@
             </template>
           </v-simple-table>
         </v-card-text>
+
+        <div v-if="date && items.length === 0">
+          <v-divider />
+
+          <v-card-text>
+            No data available.
+          </v-card-text>
+        </div>
       </v-card>
     </v-col>
   </v-row>
