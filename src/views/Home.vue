@@ -41,7 +41,7 @@
             />
           </v-menu>
 
-          <div v-if="date">
+          <div v-if="times.length > 0">
             <v-divider class="mt-3" />
 
             <v-select
@@ -95,7 +95,7 @@
           </div>
         </v-card-text>
 
-        <div v-if="date">
+        <div v-if="times.length > 0">
           <v-divider />
 
           <v-card-text>
@@ -242,7 +242,7 @@ export default {
 
       if (val) {
         // Set default times
-        this.times = [
+        let times = [
           { day: 'Wednesday', start: 540, end: 1020, break: 20 },
           { day: 'Thursday', start: 540, end: 1020, break: 20 },
           { day: 'Friday', start: 540, end: 1020, break: 20 },
@@ -266,10 +266,13 @@ export default {
               // Already exists for chosen date
               const data = doc.data()
 
-              this.times = data.times
+              times = data.times
             })
           })
-          .finally(() => this.selectedDay = this.days[0])
+          .finally(() => {
+            this.times = times
+            this.selectedDay = this.days[0]
+          })
       }
     },
 
