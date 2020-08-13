@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import firebase from 'firebase/app'
+import store from '@/store'
 
 Vue.use(VueRouter)
 
@@ -10,7 +10,6 @@ let router = new VueRouter({
     {
       component: () => import('@/views/Login'),
       meta: {
-        requiresAdmin: false,
         requiresAuth: false
       },
       name: 'Login',
@@ -19,7 +18,6 @@ let router = new VueRouter({
     {
       component: () => import('@/views/Register'),
       meta: {
-        requiresAdmin: false,
         requiresAuth: false
       },
       name: 'Register',
@@ -28,7 +26,6 @@ let router = new VueRouter({
     {
       component: () => import('@/views/Home'),
       meta: {
-        requiresAdmin: false,
         requiresAuth: true
       },
       name: 'Home',
@@ -37,7 +34,6 @@ let router = new VueRouter({
     {
       component: () => import('@/views/Timesheets'),
       meta: {
-        requiresAdmin: true,
         requiresAuth: true
       },
       name: 'Timesheets',
@@ -50,18 +46,37 @@ let router = new VueRouter({
   ]
 })
 
-router.beforeEach((to, from, next) => {
-  if (to.matched.some(m => m.meta.requiresAuth)) {
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
+const authMiddleware = (router) => {
+  router.beforeEach((to, from, next) => {
+    const loggedIn = store.state['loggedIn']
+
+    if (to.matched.some(m => m.meta.requiresAuth)) {
+      if (loggedIn) {
         next()
       } else {
         next('/login')
       }
-    })
-  } else {
-    next()
-  }
-})
+    } else {
+      if (loggedIn) {
+        next('/')
+      } else {
+        next()
+      }
+    }
+  })
+}
+
+const miscMiddleware = (router) => {
+  router.beforeEach((to, from, next) => {
+    if (to.path === from.path) {
+      return
+    } else {
+      next()
+    }
+  })
+}
+
+authMiddleware(router)
+miscMiddleware(router)
 
 export default router

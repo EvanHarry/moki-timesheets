@@ -78,7 +78,6 @@ export default {
 
     login () {
       this.$firebase.auth().signInWithEmailAndPassword(this.email, this.password)
-        .then(() => this.$router.push('/'))
         .catch((err) => {
           this.setAlert({
             msg: err.message,

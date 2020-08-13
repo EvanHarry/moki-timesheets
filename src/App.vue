@@ -119,7 +119,7 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from 'vuex'
+import { mapActions, mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'App',
@@ -147,15 +147,15 @@ export default {
   },
 
   methods: {
+    ...mapActions([
+      'login',
+      'logout'
+    ]),
+
     ...mapMutations([
       'setAlert',
       'setUser'
-    ]),
-
-    logout () {
-      this.$firebase.auth().signOut()
-        .then(() => this.$router.push('/login'))
-    }
+    ])
   },
 
   created () {
@@ -163,21 +163,7 @@ export default {
       if (user) {
         const uuid = user.uid
 
-        this.$firebase.firestore().collection('users').doc(uuid).get()
-          .then((doc) => {
-            if (doc.exists) {
-              const _user = {
-                ...doc.data(),
-                email: user.email
-              }
-
-              this.setUser(_user)
-            } else {
-              console.log('Error retrieving user info.')
-            }
-          })
-      } else {
-        this.setUser(null)
+        this.login(uuid)
       }
     })
   }

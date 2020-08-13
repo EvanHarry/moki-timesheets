@@ -18,6 +18,7 @@
             <template v-slot:activator="{ on, attrs }">
               <v-text-field
                 v-model="date"
+                clearable
                 dense
                 hide-details
                 label="Week Start"
