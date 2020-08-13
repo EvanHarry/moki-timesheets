@@ -71,6 +71,8 @@
 
                   <th class="text-left">Break</th>
 
+                  <th class="text-left">Holiday</th>
+
                   <th class="text-right">Total</th>
                 </tr>
               </thead>
@@ -88,6 +90,10 @@
 
                   <td>{{ minsToClock(item.break) }}</td>
 
+                  <td>
+                    <v-icon v-if="item.holiday">mdi-check</v-icon>
+                  </td>
+
                   <td class="text-right">{{ dayHours(item) }}</td>
                 </tr>
 
@@ -101,6 +107,10 @@
                   <td />
 
                   <td />
+
+                  <td>
+                    <strong>{{ totalHoliday }}</strong>
+                  </td>
 
                   <td class="text-right">
                     <strong>{{ totalHours }}</strong>
@@ -146,6 +156,18 @@ export default {
   },
 
   computed: {
+    totalHoliday () {
+      if (!this.selectedItem) return null
+
+      let total = 0
+
+      for (const day of this.selectedItem.times) {
+        if (day.holiday) total += 1
+      }
+
+      return `${total} Days`
+    },
+
     totalHours () {
       if (!this.selectedItem) return null
 

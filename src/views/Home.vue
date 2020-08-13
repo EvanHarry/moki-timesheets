@@ -42,8 +42,6 @@
           </v-menu>
 
           <div v-if="times.length > 0">
-            <v-divider class="mt-3" />
-
             <v-select
               v-model="selectedDay"
               :items="days"
@@ -56,41 +54,51 @@
             />
 
             <div v-if="selectedDay">
-              <v-slider
-                v-model="startTime"
-                class="mt-5"
-                color="primary"
-                hint="Start Time"
-                :label="parseTime(startTime)"
-                min="0"
-                max="1440"
-                persistent-hint
-                step="5"
-              />
-
-              <v-slider
-                v-model="endTime"
+              <v-checkbox
+                v-model="holiday"
                 class="mt-3"
                 color="primary"
-                hint="End Time"
-                :label="parseTime(endTime)"
-                min="0"
-                max="1440"
-                persistent-hint
-                step="5"
+                hide-details
+                label="Holiday"
               />
 
-              <v-slider
-                v-model="breakTime"
-                class="mt-3"
-                color="primary"
-                hint="Break"
-                :label="parseTime(breakTime)"
-                min="0"
-                max="60"
-                persistent-hint
-                step="5"
-              />
+              <div v-if="!holiday">
+                <v-slider
+                  v-model="startTime"
+                  class="mt-3"
+                  color="primary"
+                  hint="Start Time"
+                  :label="parseTime(startTime)"
+                  min="0"
+                  max="1440"
+                  persistent-hint
+                  step="5"
+                />
+
+                <v-slider
+                  v-model="endTime"
+                  class="mt-3"
+                  color="primary"
+                  hint="End Time"
+                  :label="parseTime(endTime)"
+                  min="0"
+                  max="1440"
+                  persistent-hint
+                  step="5"
+                />
+
+                <v-slider
+                  v-model="breakTime"
+                  class="mt-3"
+                  color="primary"
+                  hint="Break"
+                  :label="parseTime(breakTime)"
+                  min="0"
+                  max="60"
+                  persistent-hint
+                  step="5"
+                />
+              </div>
             </div>
           </div>
         </v-card-text>
@@ -210,7 +218,8 @@ export default {
       selectedDay: null,
       startTime: null,
       endTime: null,
-      breakTime: null
+      breakTime: null,
+      holiday: false
     }
   },
 
@@ -243,13 +252,13 @@ export default {
       if (val) {
         // Set default times
         let times = [
-          { day: 'Wednesday', start: 540, end: 1020, break: 20 },
-          { day: 'Thursday', start: 540, end: 1020, break: 20 },
-          { day: 'Friday', start: 540, end: 1020, break: 20 },
-          { day: 'Saturday', start: 0, end: 0, break: 0 },
-          { day: 'Sunday', start: 0, end: 0, break: 0 },
-          { day: 'Monday', start: 540, end: 1020, break: 20 },
-          { day: 'Tuesday', start: 540, end: 1020, break: 20 }
+          { day: 'Wednesday', start: 0, end: 0, break: 0, holiday: false },
+          { day: 'Thursday', start: 0, end: 0, break: 0, holiday: false },
+          { day: 'Friday', start: 0, end: 0, break: 0, holiday: false },
+          { day: 'Saturday', start: 0, end: 0, break: 0, holiday: false },
+          { day: 'Sunday', start: 0, end: 0, break: 0, holiday: false },
+          { day: 'Monday', start: 0, end: 0, break: 0, holiday: false },
+          { day: 'Tuesday', start: 0, end: 0, break: 0, holiday: false }
         ]
 
         // Check if entry already in database
@@ -284,6 +293,7 @@ export default {
       this.startTime = day.start
       this.endTime = day.end
       this.breakTime = day.break
+      this.holiday = day.holiday
     },
 
     startTime (val) {
@@ -296,6 +306,20 @@ export default {
 
     breakTime (val) {
       this.updateTime(val, 'break')
+    },
+
+    holiday (val) {
+      const i = this.times.findIndex(m => m.day === this.selectedDay)
+
+      if (i < 0) return
+
+      this.times[i].holiday = val
+
+      if (val) {
+        this.startTime = 0
+        this.endTime = 0
+        this.breakTime = 0
+      }
     },
 
     times: {
@@ -320,6 +344,10 @@ export default {
     },
 
     dayHours (item) {
+      if (item.holiday) {
+        return `${item.day}: Holiday`
+      }
+
       let total = item.end - item.start - item.break
 
       return minsToString(total, item.day)
