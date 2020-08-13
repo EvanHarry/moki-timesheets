@@ -41,7 +41,7 @@
           <v-list-item-content>
             <v-list-item-title>{{ user.firstName }} {{ user.lastName }}</v-list-item-title>
 
-            <v-list-item-subtitle>App Version 2020.2</v-list-item-subtitle>
+            <v-list-item-subtitle>App Version 2020.2.1</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
       </template>
